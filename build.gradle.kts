@@ -24,6 +24,7 @@ repositories {
 }
 
 dependencies {
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-data-rest")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	compileOnly("org.projectlombok:lombok")
@@ -37,7 +38,13 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-jdbc")
 	runtimeOnly("com.h2database:h2")
 	implementation("org.hibernate.validator:hibernate-validator:8.0.1.Final")
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("org.mapstruct:mapstruct:1.6.3")
+	annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
+
+
 }
+
 
 tasks.withType<Test> {
 	useJUnitPlatform()

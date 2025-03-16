@@ -1,24 +1,43 @@
 package app.task_manager.task;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
-    private final TaskRepository taskRepository;
+    private final TaskService taskService;
 
-    public TaskController(TaskRepository taskRepository) {
-        this.taskRepository = taskRepository;
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
     }
+//
+//    @GetMapping
+//    List<Task> findAll() {
+//        return taskService.findAll();
+//    }
+//
+//    @GetMapping("{id}")
+//    Task findById(@PathVariable Long id) {
+//        return taskService.findById(id);
+//    }
 
-
-    @GetMapping("/all")
-    List<Task> get() {
-        return taskRepository.get();
-    }
+//    @PostMapping("/create")
+//    @ResponseStatus(HttpStatus.CREATED)
+//    Task create(@RequestBody Task task) {
+//        return taskService.create(task);
+//    }
+//
+//    @PutMapping("/update/{id}")
+//    Task update(@PathVariable Long id, @RequestBody Task task) {
+//        return taskService.update(id, task);
+//    }
+//
+//    @DeleteMapping("/delete/{id}")
+//    void delete(@PathVariable Long id) {
+//        taskService.deleteById(id);
+//    }
 }

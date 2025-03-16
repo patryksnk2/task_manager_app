@@ -21,7 +21,7 @@ CREATE TABLE users (
                        user_id BIGINT AUTO_INCREMENT PRIMARY KEY,
                        username VARCHAR(100) NOT NULL UNIQUE,
                        email VARCHAR(255) NOT NULL UNIQUE,
-                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                       password VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE task_assigned_users (

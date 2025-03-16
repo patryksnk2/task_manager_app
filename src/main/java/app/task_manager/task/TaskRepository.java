@@ -1,25 +1,16 @@
 package app.task_manager.task;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
+
 @Repository
-public class TaskRepository {
+public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
+      Optional<TaskAttribute> findTaskAttributesById(Long taskAttributesId);
 
-    private static final Logger log = LoggerFactory.getLogger(TaskRepository.class);
-    private final JdbcClient jdbcClient;
+//    @Query("SELECT t FROM Task t WHERE t.dueDate <= :dueDate AND t.task_attributes_id = (SELECT ID from TASK_ATTRIBUTES WHERE  )")
+//    List<Task> findDueTasksByStatus(@Param("dueDate") LocalDateTime dueDate, @Param("status") String status);
 
-    public TaskRepository(JdbcClient jdbcClient) {
-        this.jdbcClient = jdbcClient;
-    }
-
-    public List<Task> get(){
-        return jdbcClient.sql("SELECT * FROM TASKS")
-                .query(Task.class)
-                .list();
-    }
 
 }
