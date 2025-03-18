@@ -5,8 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "task_attributes", uniqueConstraints = @UniqueConstraint(columnNames = {"category", "name"}))
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

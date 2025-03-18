@@ -24,13 +24,11 @@ public class TaskDTO {
     @FutureOrPresent(message = "Due date must be in the present or future")
     private LocalDateTime dueDate;
 
-    private Long taskAttributesId;
-
+    private Long statusId;  // Dodane
+    private Long priorityId; // Dodane
+    private Long parentTaskId;
     private LocalDateTime completionDate;
-
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
-
     private List<Long> assignedUsersIds;
 }

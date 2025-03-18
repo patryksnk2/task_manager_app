@@ -10,7 +10,6 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
-    //private final UserRepository userRepository;
 
     public TaskService(TaskRepository taskRepository, TaskMapper taskMapper) {
         this.taskRepository = taskRepository;
@@ -71,5 +70,7 @@ public class TaskService {
     //Kontroller DO Task Ogarnąć
     // i samemmu ogarnac User
     // i trolle
+    //Przemyślec baze danych bo nie zgadz sie priorytet dla zadania i status to powinny byc dwie kolumny oddzielne
+    // ogolnie przymslec jak powinna baza dancyh wyglądać
 }
 

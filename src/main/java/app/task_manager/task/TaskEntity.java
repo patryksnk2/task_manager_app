@@ -3,11 +3,15 @@ package app.task_manager.task;
 
 import app.task_manager.User.UserEntity;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "tasks")
 public class TaskEntity {
@@ -24,9 +28,15 @@ public class TaskEntity {
 
     private LocalDateTime dueDate;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "task_attributes_id", referencedColumnName = "id")
-    private TaskAttribute taskAttribute;
+    // Relacja do statusu
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "status_id", referencedColumnName = "id")
+    private TaskAttribute status;
+
+    // Relacja do priorytetu
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "priority_id", referencedColumnName = "id")
+    private TaskAttribute priority;
 
     private LocalDateTime completionDate;
 
@@ -36,6 +46,7 @@ public class TaskEntity {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    // Relacja do użytkowników przypisanych do zadania
     @ManyToMany
     @JoinTable(
             name = "task_assigned_users",
@@ -43,6 +54,14 @@ public class TaskEntity {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<UserEntity> assignedUsers;
+
+    // Relacja do podzadań (hierarchia)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_task_id")
+    private TaskEntity parentTask;
+
+    @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL)
+    private List<TaskEntity> subTasks;
 
     @PrePersist
     protected void onCreate() {
