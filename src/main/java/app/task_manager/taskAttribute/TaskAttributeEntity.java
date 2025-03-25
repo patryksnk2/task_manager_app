@@ -1,6 +1,7 @@
-package app.task_manager.task;
+package app.task_manager.taskAttribute;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
@@ -8,8 +9,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class TaskAttribute {
+public class TaskAttributeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

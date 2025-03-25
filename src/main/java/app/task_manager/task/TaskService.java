@@ -1,5 +1,9 @@
 package app.task_manager.task;
 
+import app.task_manager.User.UserEntity;
+import app.task_manager.User.UserRepository;
+import app.task_manager.taskAttribute.TaskAttributeEntity;
+import app.task_manager.taskAttribute.TaskAttributeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,11 +14,15 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
+    private final UserRepository userRepository;
+    private final TaskAttributeRepository taskAttributeRepository;
 
-    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper) {
+    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper, UserRepository userRepository, TaskAttributeRepository taskAttributeRepository) {
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
 
+        this.userRepository = userRepository;
+        this.taskAttributeRepository = taskAttributeRepository;
     }
 
     public List<TaskDTO> findAll() {
@@ -26,7 +34,7 @@ public class TaskService {
 
     @Transactional
     public TaskDTO create(TaskDTO taskDTO) {
-        return taskMapper.toDTO(taskRepository.save(taskMapper.toEntity(taskDTO)));
+        return taskMapper.toDTO(taskRepository.saveAndFlush(taskMapper.toEntity(taskDTO)));
     }
 
     @Transactional
@@ -34,43 +42,39 @@ public class TaskService {
         if (!taskRepository.existsById(id)) {
             throw new TaskNotFoundException("Task not found with id: " + id);
         }
+        taskRepository.deleteById(id);
     }
 
     public TaskDTO findById(Long id) {
         return taskRepository.findById(id).map(taskMapper::toDTO).orElseThrow(() -> new TaskNotFoundException("Task not found with id:" + id));
     }
 
-//    @Transactional
-//    public TaskDTO update(Long id, TaskDTO taskDTO) {
-//        Task existingTask = taskRepository.findById(id)
-//                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + id));
-//
-//        existingTask.setTitle(taskDTO.getTitle());
-//        existingTask.setDescription(taskDTO.getDescription());
-//        existingTask.setDueDate(taskDTO.getDueDate());
-//
-//        // Zamiast tworzyć nową instancję TaskAttributes, pobieramy pełny obiekt z bazy danych
-//        TaskAttribute taskAttributes = taskRepository.findTaskAttributesById(taskDTO.getTaskAttributesId())
-//                .orElseThrow(() -> new TaskNotFoundException("TaskAttributes not found with id: " + taskDTO.getTaskAttributesId()));
-//
-//        // Zaktualizowanie TaskAttributes w obiekcie Task
-//        existingTask.setTaskAttribute(taskAttributes);
-//
-//        existingTask.setCompletionDate(taskDTO.getCompletionDate());
-//
-//        // Mapowanie użytkowników na podstawie ich identyfikatorów
-//        List<app.task_manager.user.UserEntity> assignedUsers = taskMapper.mapIdsToUserEntities(taskDTO.getAssignedUsersIds(), userRepository);
-//        existingTask.setAssignedUsers(assignedUsers);
-//
-//        existingTask = taskRepository.save(existingTask);
-//        return taskMapper.toDTO(existingTask);
-//    }
-//poprwaić bo to ma byc TaskAttributeId bo to jest tylko ID jako refernmacja do tabeli TaskAttributes usunac to S na końcu
-    // Posprawdzać wszystko
-    //Kontroller DO Task Ogarnąć
-    // i samemmu ogarnac User
-    // i trolle
-    //Przemyślec baze danych bo nie zgadz sie priorytet dla zadania i status to powinny byc dwie kolumny oddzielne
-    // ogolnie przymslec jak powinna baza dancyh wyglądać
+    @Transactional
+    public TaskDTO update(Long id, TaskDTO taskDTO) {
+        TaskEntity existingTask = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + id));
+
+        taskMapper.updateEntityFromDto(existingTask, taskDTO);
+
+        if (taskDTO.getAssignedUsersIds() != null) {
+            List<UserEntity> assignedUsers = userRepository.findAllById(taskDTO.getAssignedUsersIds());
+            existingTask.setAssignedUsers(assignedUsers);
+        }
+        if (taskDTO.getStatusId() != null) {
+            TaskAttributeEntity statusId = taskAttributeRepository.findById(taskDTO.getStatusId()).orElse(null);
+            existingTask.setStatus(statusId);
+        }
+
+        if (taskDTO.getPriorityId() != null) {
+            TaskAttributeEntity priorityId = taskAttributeRepository.findById(taskDTO.getPriorityId()).orElse(null);
+            existingTask.setStatus(priorityId);
+        }
+        if (taskDTO.getParentTaskId() != null) {
+            TaskEntity parentTask = taskRepository.findById(taskDTO.getParentTaskId()).orElse(null);
+            existingTask.setParentTask(parentTask);
+        }
+        return taskMapper.toDTO(taskRepository.saveAndFlush(existingTask));
+    }
+
 }
 

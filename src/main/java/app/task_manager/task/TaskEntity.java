@@ -2,6 +2,7 @@ package app.task_manager.task;
 
 
 import app.task_manager.User.UserEntity;
+import app.task_manager.taskAttribute.TaskAttributeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,15 +29,14 @@ public class TaskEntity {
 
     private LocalDateTime dueDate;
 
-    // Relacja do statusu
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id", referencedColumnName = "id")
-    private TaskAttribute status;
+    private TaskAttributeEntity status;
 
-    // Relacja do priorytetu
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "priority_id", referencedColumnName = "id")
-    private TaskAttribute priority;
+    private TaskAttributeEntity priority;
 
     private LocalDateTime completionDate;
 
@@ -46,7 +46,6 @@ public class TaskEntity {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    // Relacja do użytkowników przypisanych do zadania
     @ManyToMany
     @JoinTable(
             name = "task_assigned_users",
@@ -55,7 +54,6 @@ public class TaskEntity {
     )
     private List<UserEntity> assignedUsers;
 
-    // Relacja do podzadań (hierarchia)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_task_id")
     private TaskEntity parentTask;
@@ -68,6 +66,7 @@ public class TaskEntity {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
+
 
     @PreUpdate
     protected void onUpdate() {

@@ -1,20 +1,24 @@
 package app.task_manager.task;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", uses = TaskMapperHelper.class)
 public interface TaskMapper {
 
-    @Mapping(source = "status.id", target = "statusId")
-    @Mapping(source = "priority.id", target = "priorityId")
+
+    @Mapping(source = "status", target = "statusId", qualifiedByName = "mapTaskAttributeEntityToId")
+    @Mapping(source = "priority", target = "priorityId", qualifiedByName = "mapTaskAttributeEntityToId")
     @Mapping(source = "assignedUsers", target = "assignedUsersIds", qualifiedByName = "mapUserEntitiesToIds")
-    @Mapping(source = "parentTask.id", target = "parentTaskId")
+    @Mapping(source = "parentTask", target = "parentTaskId", qualifiedByName = "mapParentTaskEntityToId")
     TaskDTO toDTO(TaskEntity task);
 
-    @Mapping(source = "statusId", target = "status.id")
-    @Mapping(source = "priorityId", target = "priority.id")
+    @Mapping(source = "statusId", target = "status", qualifiedByName = "mapTaskAttributeIdToEntity")
+    @Mapping(source = "priorityId", target = "priority", qualifiedByName = "mapTaskAttributeIdToEntity")
     @Mapping(source = "assignedUsersIds", target = "assignedUsers", qualifiedByName = "mapIdsToUserEntities")
-    @Mapping(source = "parentTaskId", target = "parentTask.id")
+    @Mapping(source = "parentTaskId", target = "parentTask", qualifiedByName = "mapParentTaskIdToEntity")
     TaskEntity toEntity(TaskDTO taskDTO);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateEntityFromDto(@MappingTarget TaskEntity taskEntity, TaskDTO taskDTO);
+
 }
