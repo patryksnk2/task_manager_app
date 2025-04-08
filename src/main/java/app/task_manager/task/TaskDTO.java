@@ -31,4 +31,6 @@ public class TaskDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<Long> assignedUsersIds;
+    private List<Long> tagIds;
+    private List<Long> commentIds;
 }

@@ -1,9 +1,12 @@
 package app.task_manager.tag;
 
+import app.task_manager.task.TaskEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Table(name = "tags", uniqueConstraints = @UniqueConstraint(columnNames = {"name"}))
@@ -17,5 +20,8 @@ public class TagEntity {
 
     @Column(nullable = false)
     String name;
+
+    @ManyToMany(mappedBy = "tags")
+    private List<TaskEntity> tasks;
 
 }

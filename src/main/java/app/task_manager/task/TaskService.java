@@ -1,9 +1,15 @@
 package app.task_manager.task;
 
+import app.task_manager.User.UserDTO;
 import app.task_manager.User.UserEntity;
 import app.task_manager.User.UserRepository;
+import app.task_manager.User.UserService;
+import app.task_manager.tag.TagRepository;
 import app.task_manager.taskAttribute.TaskAttributeEntity;
 import app.task_manager.taskAttribute.TaskAttributeRepository;
+import app.task_manager.task_comment.TaskCommentDTO;
+import app.task_manager.task_comment.TaskCommentEntity;
+import app.task_manager.task_comment.TaskCommentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,13 +22,18 @@ public class TaskService {
     private final TaskMapper taskMapper;
     private final UserRepository userRepository;
     private final TaskAttributeRepository taskAttributeRepository;
+    private final TaskCommentRepository taskCommentRepository;
+    private final TagRepository tagRepository;
+    private final UserService userService;
 
-    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper, UserRepository userRepository, TaskAttributeRepository taskAttributeRepository) {
+    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper, UserRepository userRepository, TaskAttributeRepository taskAttributeRepository, TaskCommentRepository taskCommentRepository, TagRepository tagRepository, UserService userService) {
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
-
         this.userRepository = userRepository;
         this.taskAttributeRepository = taskAttributeRepository;
+        this.taskCommentRepository = taskCommentRepository;
+        this.tagRepository = tagRepository;
+        this.userService = userService;
     }
 
     public List<TaskDTO> findAll() {
@@ -76,5 +87,24 @@ public class TaskService {
         return taskMapper.toDTO(taskRepository.saveAndFlush(existingTask));
     }
 
+//    @Transactional
+//    public TaskDTO addCommentToTask(Long taskId, TaskCommentDTO taskCommentDTO){
+//
+//        TaskEntity taskEntity = taskRepository.findById(taskId)
+//                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
+//
+//        UserDTO currentUser = userService.getCurrentUser();
+//
+//        //budujemy agregat dla danego zadania
+//        TaskAggregate taskAggregate = TaskAggregate.builder()
+//                .taskEntity(taskEntity)
+//                .assignedUsers(taskEntity.getAssignedUsers())
+//                .comments(taskCommentRepository.findAllByTaskId(taskEntity.getId()))
+//                .tags(tagRepository.findALlByTaskId(taskEntity.getId()))
+//                .build();
+//
+//        taskAggregate.addComment(taskCommentDTO,currentUser);
+//
+//    }
 }
 

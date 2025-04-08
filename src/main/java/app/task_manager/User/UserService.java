@@ -1,5 +1,7 @@
 package app.task_manager.User;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,5 +79,18 @@ public class UserService {
 
         userRepository.deleteById(userId);
     }
+    public UserDTO getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new UserNotFoundException("No authenticated user found.");
+        }
+
+        String username = authentication.getName();
+
+        UserEntity userEntity = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
+
+        return userMapper.toDTO(userEntity);
+    }
 }

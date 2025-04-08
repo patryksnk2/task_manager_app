@@ -9,8 +9,10 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<app.task_manager.User.UserEntity, Long> {
-    @Query("SELECT COUNT(*)>0 FROM UserEntity u WHERE u.email = :EMAIL")
+    @Query("SELECT COUNT(*)>0 FROM UserEntity u WHERE u.email = :email")
     Boolean existByEmail(@Param("email") String email);
 
     Optional<UserEntity> findByEmail(String email);
+
+    Optional<UserEntity> findByUsername(String username);
 }

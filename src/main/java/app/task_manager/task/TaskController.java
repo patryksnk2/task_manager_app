@@ -23,7 +23,7 @@ public class TaskController {
         List<TaskDTO> tasks = taskService.findAll();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(tasks.size()));  // Dodanie nagłówka X-Total-Count, który informuje o liczbie zadań.
+        headers.add("X-Total-Count", String.valueOf(tasks.size()));
 
         return ResponseEntity.ok()
                 .headers(headers)
@@ -36,9 +36,9 @@ public class TaskController {
         TaskDTO createdTask = taskService.create(taskDTO);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Location", "/api/tasks/" + createdTask.getId());  // Nagłówek Location wskazuje URL nowo utworzonego zasobu.
+        headers.add("Location", "/api/tasks/" + createdTask.getId());
 
-        return ResponseEntity.status(HttpStatus.CREATED)  // Kod statusu 201 - Created
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .headers(headers)
                 .body(createdTask);
     }

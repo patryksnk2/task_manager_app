@@ -4,9 +4,11 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -18,24 +20,24 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> create(@Valid @RequestBody UserDTO userDTO) {
+    public ResponseEntity<UserDTO> create(@Valid @RequestBody UserDTO userDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            List<String> errorMessages = bindingResult.getFieldErrors().stream()
+                    .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                    .toList();
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
         UserDTO createdUser = userService.create(userDTO);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-User-ID", String.valueOf(createdUser.getUserId()));
+        // headers.add("X-User-ID", String.valueOf(createdUser.getUserId()));
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .headers(headers)
                 .body(createdUser);
     }
 
-    @GetMapping("/login")
-    public ResponseEntity<UserDTO> login(@Valid @RequestBody UserDTO userDTO) {
-        UserDTO user = userService.login(userDTO);
-        return ResponseEntity
-                .ok()
-                .body(user);
-    }
 
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAll() {
@@ -49,31 +51,40 @@ public class UserController {
                 .body(users);
     }
 
+
     @GetMapping("/{userId}")
     public ResponseEntity<UserDTO> getById(@PathVariable Long userId) {
         UserDTO user = userService.getById(userId);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-User-ID", String.valueOf(user.getUserId()));
+        // headers.add("X-User-ID", String.valueOf(user.getUserId()));
 
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(user);
     }
 
-    // Endpoint do aktualizacji użytkownika
+
     @PutMapping("/{userId}")
-    public ResponseEntity<UserDTO> update(@PathVariable Long userId, @Valid @RequestBody UserDTO userDTO) {
+    public ResponseEntity<String> update(@PathVariable Long userId, @Valid @RequestBody UserDTO userDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            List<String> errorMessages = bindingResult.getFieldErrors().stream()
+                    .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(String.join(", ", errorMessages), HttpStatus.BAD_REQUEST);
+        }
+
         UserDTO updatedUser = userService.update(userId, userDTO);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-User-ID", String.valueOf(updatedUser.getUserId()));
+        // headers.add("X-User-ID", String.valueOf(updatedUser.getUserId()));
         headers.add("X-Update-Timestamp", String.valueOf(System.currentTimeMillis()));
 
         return ResponseEntity.status(HttpStatus.OK)
                 .headers(headers)
-                .body(updatedUser);
+                .body("User updated successfully!");
     }
+
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> delete(@PathVariable Long userId) {
@@ -85,5 +96,10 @@ public class UserController {
         return ResponseEntity.noContent()
                 .headers(headers)
                 .build();
+    }
+
+    @GetMapping("/current-user")
+    public UserDTO getCurrentUser() {
+        return userService.getCurrentUser();
     }
 }

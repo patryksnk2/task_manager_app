@@ -2,11 +2,14 @@ package app.task_manager.task;
 
 
 import app.task_manager.User.UserEntity;
+import app.task_manager.tag.TagEntity;
 import app.task_manager.taskAttribute.TaskAttributeEntity;
+import app.task_manager.task_comment.TaskCommentEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -19,6 +22,7 @@ public class TaskEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "task_id")
     private Long id;
 
     @Column(nullable = false)
@@ -58,7 +62,7 @@ public class TaskEntity {
     @JoinColumn(name = "parent_task_id")
     private TaskEntity parentTask;
 
-    @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TaskEntity> subTasks;
 
     @PrePersist
@@ -67,6 +71,16 @@ public class TaskEntity {
         updatedAt = LocalDateTime.now();
     }
 
+    @ManyToMany
+    @JoinTable(
+            name = "task_tags",
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<TagEntity> tags;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TaskCommentEntity> comments;
 
     @PreUpdate
     protected void onUpdate() {
