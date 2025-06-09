@@ -1,3 +1,4 @@
+// SwaggerConfig.java
 package app.task_manager.config;
 
 import io.swagger.v3.oas.models.Components;
@@ -13,21 +14,19 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-        final String securitySchemeName = "basicAuth";
-
+        final String securitySchemeName = "bearerAuth";
         return new OpenAPI()
-                .info(new Info()
-                        .title("Spring Boot learning")
-                        .version("1.0")
-                        .description("Swagger Documentation"))
-                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName,
                                 new SecurityScheme()
                                         .name(securitySchemeName)
                                         .type(SecurityScheme.Type.HTTP)
-                                        .scheme("basic")
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
                         )
-                );
+                )
+                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
+                .info(new Info().title("Task Manager API").version("1.0"));
     }
+
 }
