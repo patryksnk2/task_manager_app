@@ -1,99 +1,122 @@
 # Task Manager REST API
 
-## Opis projektu
-
-Task Manager REST API to zaawansowany backend do zarządzania zadaniami, użytkownikami oraz powiadomieniami w systemie.  
-System umożliwia rejestrację, logowanie, przypisywanie zadań, komentowanie, filtrowanie zadań po tagach i atrybutach oraz obsługę powiadomień.  
-Projekt uwzględnia mechanizmy bezpieczeństwa: uwierzytelnianie i autoryzację za pomocą JWT oraz role użytkowników (ADMIN, USER).
+A robust and scalable RESTful API server for comprehensive task management, built with Java 17+, Spring Boot 3.x, Spring Security (JWT), Hibernate (JPA), and an embedded H2 database. This backend service supports user management, task assignment, notifications, and robust role-based access control (RBAC).
 
 ---
 
-## Spis treści
+## Table of Contents
 
-- [Opis projektu](#opis-projektu)  
-- [Funkcjonalności](#funkcjonalności)  
-- [Architektura](#architektura)  
-- [Technologie](#technologie)  
-- [Struktura bazy danych](#struktura-bazy-danych)  
-- [Role i uprawnienia](#role-i-uprawnienia)  
-- [Instalacja i uruchomienie](#instalacja-i-uruchomienie)  
-- [Endpoints API](#endpoints-api)  
-- [Testy](#testy)  
-- [Plany rozwoju](#plany-rozwoju)  
-- [Wyzwania i rozwiązania](#wyzwania-i-rozwiazania)  
-- [Kontakt](#kontakt)
-
----
-
-## Funkcjonalności
-
-- **Rejestracja i logowanie** użytkowników z walidacją danych i szyfrowaniem haseł  
-- **Role RBAC:** ADMIN i USER z różnymi poziomami uprawnień  
-- **Zarządzanie zadaniami:** tworzenie, edycja, przypisywanie użytkowników, hierarchia zadań (zadania nadrzędne i podrzędne)  
-- **Komentarze do zadań** z możliwością wątku odpowiedzi  
-- **Tagi i atrybuty zadań:** definiowanie, przypisywanie, filtrowanie  
-- **Powiadomienia:** wewnętrzne (na koncie użytkownika) i planowane rozszerzenie o powiadomienia e-mail  
-- **Bezpieczeństwo:** JWT, szyfrowanie, autoryzacja na poziomie endpointów  
-- **Stateless API:** brak sesji, skalowalność
+- [Project Overview](#project-overview)  
+- [Features](#features)  
+- [Architecture](#architecture)  
+- [Technology Stack](#technology-stack)  
+- [Database Structure](#database-structure)  
+- [Roles & Permissions](#roles--permissions)  
+- [Getting Started](#getting-started)  
+- [API Endpoints Overview](#api-endpoints-overview)  
+- [Testing](#testing)  
+- [Challenges & Solutions](#challenges--solutions)  
+- [Future Plans](#future-plans)  
+- [Contact](#contact)  
 
 ---
 
-## Architektura
+## Project Overview
 
-Projekt oparty jest na warstwowej architekturze:  
-- **Warstwa prezentacji:** REST API (Spring MVC)  
-- **Warstwa serwisowa:** logika biznesowa  
-- **Warstwa dostępu do danych:** JPA/Hibernate  
-- **Warstwa bezpieczeństwa:** Spring Security z JWT  
-- **Baza danych:** relacyjna (MySQL / MariaDB lub inna)
+The Task Manager REST API provides backend functionality for managing tasks, users, and notifications. The system includes secure authentication, RBAC, task tagging, hierarchical tasks, and extensible notification features. Designed for statelessness and scalability, it is ideal for integration with frontend clients or other services.
 
 ---
 
-## Technologie
+## Features
+
+- **User Registration & Authentication**  
+  Secure registration and login with data validation and password encryption.
+
+- **Role-Based Access Control (RBAC)**  
+  Two roles: ADMIN (full access) and USER (limited access to own resources).
+
+- **Task Management**  
+  Create, edit, assign, and manage hierarchical tasks (parent/child relationships).
+
+- **Comments and Threads**  
+  Add comments to tasks, with support for threaded discussions.
+
+- **Tags & Attributes**  
+  Define, assign, and filter tasks by tags and attributes (status, priority, etc.).
+
+- **Notifications**  
+  In-app notifications, with extensibility for email or other channels.
+
+- **Security**  
+  Stateless JWT authentication, endpoint-level authorization, and encrypted credentials.
+
+- **Stateless API**  
+  No server-side sessions; scalable and cloud-ready.
+
+---
+
+## Architecture
+
+The project follows a layered architecture:
+
+- **Presentation Layer:** REST API (Spring MVC)  
+- **Service Layer:** Business logic and orchestration  
+- **Persistence Layer:** Data access via JPA/Hibernate  
+- **Security Layer:** Spring Security with JWT authentication  
+- **Database:** Embedded H2 (can be swapped for MySQL/MariaDB if needed)
+
+---
+
+## Technology Stack
 
 - Java 17+  
 - Spring Boot 3.x  
 - Spring Security (JWT)  
 - Hibernate / JPA  
 - Maven / Gradle  
-- MySQL / MariaDB (lub inna relacyjna baza danych)  
-- JUnit 5, Mockito (testy jednostkowe)  
+- H2 Database (embedded, for development/testing)  
+- JUnit 5, Mockito (unit and integration testing)
 
 ---
 
-## Struktura bazy danych
+## Database Structure
 
-Tabela i relacje główne:  
+| Table                | Description                                         |
+|----------------------|-----------------------------------------------------|
+| `users`              | User accounts                                       |
+| `roles`              | User roles (ADMIN, USER)                            |
+| `user_roles`         | Assignment of roles to users                        |
+| `tasks`              | Tasks, including title, description, status        |
+| `task_attributes`    | Task attributes (e.g., status, priority)            |
+| `tags`               | Task tags                                          |
+| `task_tags`          | Task-tag assignments                               |
+| `task_assigned_users`| User-task assignments                              |
+| `task_comments`      | Comments and threads on tasks                        |
+| `notifications`      | In-app notifications for users                       |
 
-| Tabela              | Opis                                              |
-|---------------------|---------------------------------------------------|
-| `users`             | Użytkownicy systemu                                |
-| `roles`             | Role użytkowników (np. ADMIN, USER)                |
-| `user_roles`        | Przypisanie ról do użytkowników                    |
-| `tasks`             | Zadania, w tym tytuł, opis, status, priorytet     |
-| `task_attributes`   | Atrybuty zadań (status, priorytet itd.)            |
-| `tags`              | Tagowanie zadań                                    |
-| `task_tags`         | Przypisanie tagów do zadań                         |
-| `task_assigned_users`| Przypisanie użytkowników do zadań                  |
-| `task_comments`     | Komentarze do zadań, wątki komentarzy              |
-| `notifications`     | Powiadomienia użytkowników                          |
-
-Relacje zapewniają integralność danych i ułatwiają rozbudowę.
+*Note: The schema is designed for easy extensibility and integrity.*
 
 ---
 
-## Role i uprawnienia
+## Roles & Permissions
 
-| Rola  | Uprawnienia                                                                                  |
-|-------|---------------------------------------------------------------------------------------------|
-| ADMIN | Pełny dostęp: zarządzanie użytkownikami, zadaniami, tagami, powiadomieniami oraz konfiguracją |
-| USER  | Dostęp do własnych zadań: przeglądanie, komentowanie, tworzenie zadań, filtrowanie po tagach |
+| Role  | Permissions                                                  |
+|-------|--------------------------------------------------------------|
+| ADMIN | Full access: user, task, tag, notification, and configuration management |
+| USER  | Limited to own tasks: view, comment, create, and filter tasks by tags |
 
 ---
 
-## Instalacja i uruchomienie
+## Getting Started
 
-1. **Klonuj repozytorium:**  
+### Prerequisites
+
+- Java 17 or newer  
+- Maven or Gradle  
+
+### Installation & Run
+
+1. Clone the repository:  
    ```bash
-   git clone https://github.com/twoj-repo/task-manager-api.git
-   cd task-manager-api
+   git clone https://github.com/patryksnk2/task_manager_app.git
+   cd task_manager_app
